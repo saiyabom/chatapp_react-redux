@@ -7,6 +7,9 @@ module.exports = options => {
       publicPath: '/',
       filename: 'bundle.js'
     },
+    devServer: {
+      historyApiFallback: true,
+    },
     module: {
       rules: [
         {

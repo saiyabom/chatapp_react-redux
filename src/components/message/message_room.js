@@ -26,22 +26,21 @@ class MessageRoom extends Component{
     componentDidMount(){
       //this.setupSocketIO(this.props.roomName)
     }
-    sendMessage(message){
+    sendMessage(user,message){
       const {roomName,addMessageRoom} = this.props
-      const user='danial'
       const params = {from:user, to:roomName, message,createdAt:moment().format('LT')}
 
       this.props.message.socket.emit('createMessage', params, function () {
         console.log('createMessage was emited')
         console.log(params)
-        addMessageRoom(params.from,params.to,params.message,params.createdAt)
+        addMessageRoom(params.from,params.to,params.message,params.createdAt,true)
       });
 
     }
     handleSend(e){
       e.preventDefault()
       console.log('handleSend click')
-      this.sendMessage(this.state.term)
+      this.sendMessage(this.props.email,this.state.term)
       this.setState({ term: "" });
     }
     setupSocketIO(roomName){
@@ -49,42 +48,21 @@ class MessageRoom extends Component{
       const { socket } = this.props.message
 
       console.log(socket)
-      // this.props.message.socket.on('newMessage',(response)=>{
-      //   const {from, to, message, createdAt} = response
-      //   console.log('newMessage was emit: received')
-      //   addMessageRoom(from,to,message,createdAt)
-      //
-      // })
-
-
-  //     socket.on('disconnect', function () {
-  //       console.log('Disconnected from server');
-  //     });
-  //
-  //     socket.on('newMessage', function (message) {
-  //       var formattedTime = moment(message.createdAt).format('h:mm a');
-  //
-  // // var html = Mustache.render(template, {
-  // //   text: message.text,
-  // //   from: message.from,
-  // //   createdAt: formattedTime
-  //
-  //     });
     }
 
     renderItems(){
-
-        // const i=[1,2,3,4,5,6,7,8]
-        // return _.map(i,x=>{
-        //   return <MessageItem key={x} name='Jack Danial' time='13:00' message='Lorem message'/>
-        // })
-        const { roomName } = this.props
+        const { roomName, email } = this.props
         const messageList = this.props.message[roomName]
         console.log('renderItem: messageList')
         console.log(this.props.message)
         return _.map(messageList, (messageItem,index)=>{
           const {from, to, message,createdAt} = messageItem
-          return <MessageItem key={index} name={from} time={createdAt} message={message} />
+          const isSender = (email===from)
+          console.log('Email:',email)
+          console.log('from:',from)
+          console.log('isSender', isSender);
+
+          return <MessageItem key={index} name={from} time={createdAt} message={message} isSender={isSender}/>
         })
 
 
@@ -135,7 +113,8 @@ class MessageRoom extends Component{
 }
 function mapStateToProps(state){
   return{
-    message: state.message
+    message: state.message,
+    email: state.auth.email
   }
 }
 function mapDispatchToProps(dispatch){

@@ -9,7 +9,7 @@ import { bindActionCreators } from "redux";
 import MessageRoom from './message_room'
 import MessageRoomTest from './message_room_test'
 import { setupSocket ,addMessageRoom} from '../../actions'
-import SocketIO from "socket.io-client"
+
 import _ from 'lodash'
 
 
@@ -21,22 +21,12 @@ class MessageSection extends Component{
 
   }
   componentDidMount(){
-    const socket = SocketIO('http://localhost:3090');
+    // const socket = SocketIO('http://localhost:3090');
     //console.log(socket)
-    const { setupSocket, addMessageRoom} = this.props
-    socket.on('connect',()=>{
-      //console.log('io')
-      socket.on('newMessage',(response)=>{
-        const {from, to, message, createdAt} = response
-        console.log('newMessage was emit: received')
-        console.log(response)
-        addMessageRoom(from,to,message,createdAt)
-        //callback(from,to,message,createdAt)
 
-      })
-      console.log('connect')
-    })
-    setupSocket(socket);
+    const { setupSocket, addMessageRoom} = this.props
+
+    setupSocket();
   }
 
   renderRoomLists(roomList){
@@ -62,7 +52,7 @@ class MessageSection extends Component{
 }
 function mapStateToProps(state){
   return{
-    message: state.message
+    message: state.message,
   }
 }
 function mapDispatchToProps(dispatch) {
